@@ -205,11 +205,19 @@ public class MainActivity extends Activity {
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.addView(tile("🔎", "Dictionnaire", DictionaryActivity.class), lp(0, W, 0, 0, 4, 0));
         row.addView(tile("✍️", "Exercices", QuizActivity.class), lp(0, W, 4, 0, 4, 0));
-        row.addView(tile("🌍", "Traducteur", TranslateActivity.class), lp(0, W, 4, 0, 0, 0));
-        for (int i = 0; i < 3; i++) {
+        row.addView(tile("🌍", "Traducteur", TranslateActivity.class), lp(0, W, 4, 0, 4, 0));
+        row.addView(tile("🎙️", "Voix Fon", FonTtsActivity.class), lp(0, W, 4, 0, 0, 0));
+        for (int i = 0; i < 4; i++) {
             ((LinearLayout.LayoutParams) row.getChildAt(i).getLayoutParams()).weight = 1f;
         }
-        homeBox.addView(row, lp(M, W, 0, 0, 0, 16));
+        homeBox.addView(row, lp(M, W, 0, 0, 0, 8));
+
+        LinearLayout row2 = new LinearLayout(this);
+        row2.setOrientation(LinearLayout.HORIZONTAL);
+        row2.addView(tile("📖", "Bible en fongbé : versets et mots", BibleActivity.class),
+            lp(0, W, 0, 0, 0, 0));
+        ((LinearLayout.LayoutParams) row2.getChildAt(0).getLayoutParams()).weight = 1f;
+        homeBox.addView(row2, lp(M, W, 0, 0, 0, 16));
 
         homeBox.addView(tv("Parcours", 18, TEXT, true), lp(M, W, 0, 0, 0, 8));
 

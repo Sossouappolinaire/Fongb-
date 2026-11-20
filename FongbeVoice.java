@@ -1,6 +1,7 @@
 package bj.fongbe.academie;
 
 import android.app.Activity;
+import android.content.Context;
 import android.media.MediaPlayer;
 import android.widget.Toast;
 
@@ -58,37 +59,19 @@ public class FongbeVoice {
             return;
         }
 
-        // 2) Audio déjà téléchargé
-        final File cached = cacheFile(a, e.fon);
-        if (cached.exists()) {
+        // 2) Audio déjà généré (cache) ou génération en ligne
+        final File cached = findCached(a, e.fon);
+        if (cached != null) {
             playFile(a, cached);
             return;
         }
 
-        // 3) Voix en ligne
-        if (Config.ONLINE_ENABLED && Config.SPACE_URL.length() > 0) {
+        if (Config.ONLINE_ENABLED) {
             Toast.makeText(a, "Chargement de la voix fongbé…", Toast.LENGTH_SHORT).show();
             new Thread(() -> {
                 try {
-                    String url = null;
-                    String prefixUsed = null;
-                    String[] prefixes = {"/gradio_api/call/", "/call/"};
-                    for (String p : prefixes) {
-                        try {
-                            url = tryGradio(Config.SPACE_URL, p, e.fon);
-                        } catch (Exception ex) {
-                            url = null;
-                        }
-                        if (url != null) {
-                            prefixUsed = p;
-                            break;
-                        }
-                    }
-                    if (url == null) {
-                        throw new Exception("pas d'audio");
-                    }
-                    download(url, cached);
-                    a.runOnUiThread(() -> playFile(a, cached));
+                    final File f = synthesize(a, e.fon);
+                    a.runOnUiThread(() -> playFile(a, f));
                 } catch (Exception ex) {
                     a.runOnUiThread(() -> Toast.makeText(
                         a,
@@ -106,6 +89,137 @@ public class FongbeVoice {
             "Pas encore d'audio fongbé pour « " + e.fr + " » (fichier attendu : " + e.key + ".mp3).",
             Toast.LENGTH_LONG
         ).show();
+    }
+
+    // ----- Génération de la voix (bloquant : hors thread principal) -----
+
+    /** Renvoie le fichier audio du texte fongbé : cache, sinon API Hugging Face, puis Space. */
+    public static File synthesize(Context ctx, String fon) throws Exception {
+
+        File cached = findCached(ctx, fon);
+        if (cached != null) {
+            return cached;
+        }
+
+        Exception last = null;
+
+        // a) API Hugging Face (modèle Meta MMS) avec le jeton de l'utilisateur
+        String token = ctx.getSharedPreferences("fongbe", Context.MODE_PRIVATE)
+            .getString("hf_token", "");
+        if (token != null && token.trim().length() > 0) {
+            try {
+                JSONObject body = new JSONObject().put("inputs", fon);
+                File f = postForAudio(ctx, fon, Config.HF_MODEL_URL, body.toString(),
+                    token.trim(), true);
+                if (f != null) {
+                    return f;
+                }
+            } catch (Exception ex) {
+                last = ex;
+            }
+        }
+
+        // b) Space public
+        if (Config.SPACE_URL.length() > 0) {
+            try {
+                File f = viaSpace(ctx, fon);
+                if (f != null) {
+                    return f;
+                }
+            } catch (Exception ex) {
+                last = ex;
+            }
+        }
+
+        throw last != null ? last : new Exception("pas d'audio");
+    }
+
+    /**
+     * POST JSON, réponse attendue = audio brut. {@code secret} : jeton Bearer
+     * Hugging Face ({@code hf} = true).
+     */
+    private static File postForAudio(Context ctx, String fon, String url, String json,
+                                     String secret, boolean hf) throws Exception {
+
+        HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
+        c.setRequestMethod("POST");
+        c.setDoOutput(true);
+        c.setConnectTimeout(20000);
+        c.setReadTimeout(90000);
+        c.setRequestProperty("Content-Type", "application/json");
+        if (secret != null) {
+            if (hf) {
+                c.setRequestProperty("Authorization", "Bearer " + secret);
+                c.setRequestProperty("x-wait-for-model", "true");
+            } else {
+                c.setRequestProperty("X-API-Key", secret);
+            }
+        }
+
+        OutputStream os = c.getOutputStream();
+        os.write(json.getBytes("UTF-8"));
+        os.close();
+
+        if (c.getResponseCode() != 200) {
+            throw new Exception("HTTP " + c.getResponseCode());
+        }
+        String type = c.getContentType() == null ? "" : c.getContentType().toLowerCase(Locale.ROOT);
+        if (!type.startsWith("audio") && !type.contains("octet-stream")) {
+            throw new Exception("réponse non audio");
+        }
+
+        File out = cacheFile(ctx, fon, extFor(type));
+        saveStream(c.getInputStream(), out);
+        return out;
+    }
+
+    private static File viaSpace(Context ctx, String fon) throws Exception {
+        String url = null;
+        String[] prefixes = {"/gradio_api/call/", "/call/"};
+        for (String p : prefixes) {
+            try {
+                url = tryGradio(Config.SPACE_URL, p, fon);
+            } catch (Exception ex) {
+                url = null;
+            }
+            if (url != null) {
+                break;
+            }
+        }
+        if (url == null) {
+            return null;
+        }
+        File out = cacheFile(ctx, fon, "wav");
+        download(url, out);
+        return out;
+    }
+
+    private static String extFor(String contentType) {
+        if (contentType.contains("flac")) {
+            return "flac";
+        }
+        if (contentType.contains("mpeg") || contentType.contains("mp3")) {
+            return "mp3";
+        }
+        if (contentType.contains("ogg")) {
+            return "ogg";
+        }
+        return "wav";
+    }
+
+    /** Type MIME d'un fichier audio du cache (pour l'enregistrement dans Téléchargements). */
+    public static String mimeFor(File f) {
+        String n = f.getName().toLowerCase(Locale.ROOT);
+        if (n.endsWith(".flac")) {
+            return "audio/flac";
+        }
+        if (n.endsWith(".mp3")) {
+            return "audio/mpeg";
+        }
+        if (n.endsWith(".ogg")) {
+            return "audio/ogg";
+        }
+        return "audio/wav";
     }
 
     // ----- Gradio (Space Hugging Face) -----
@@ -189,8 +303,12 @@ public class FongbeVoice {
         HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
         c.setConnectTimeout(20000);
         c.setReadTimeout(60000);
-        InputStream in = c.getInputStream();
-        FileOutputStream fo = new FileOutputStream(out);
+        saveStream(c.getInputStream(), out);
+    }
+
+    private static void saveStream(InputStream in, File out) throws Exception {
+        File tmp = new File(out.getPath() + ".part");
+        FileOutputStream fo = new FileOutputStream(tmp);
         byte[] buf = new byte[8192];
         int n;
         while ((n = in.read(buf)) > 0) {
@@ -198,13 +316,34 @@ public class FongbeVoice {
         }
         fo.close();
         in.close();
+        if (tmp.length() == 0 || !tmp.renameTo(out)) {
+            tmp.delete();
+            throw new Exception("audio vide");
+        }
     }
 
-    private static File cacheFile(Activity a, String fon) {
-        return new File(a.getCacheDir(), "fon_" + Integer.toHexString(fon.hashCode()) + ".wav");
+    private static File cacheFile(Context ctx, String fon, String ext) {
+        return new File(ctx.getCacheDir(), "fon_" + Integer.toHexString(fon.hashCode()) + "." + ext);
+    }
+
+    /** Audio déjà généré pour ce texte, quel que soit son format. */
+    public static File findCached(Context ctx, String fon) {
+        String[] exts = {"wav", "flac", "mp3", "ogg"};
+        for (String ext : exts) {
+            File f = cacheFile(ctx, fon, ext);
+            if (f.exists() && f.length() > 0) {
+                return f;
+            }
+        }
+        return null;
     }
 
     // ----- Lecture -----
+
+    /** Joue un fichier audio déjà généré (utilisé par l'écran « Voix fongbé »). */
+    public static void playCached(Activity a, File f) {
+        playFile(a, f);
+    }
 
     private static void playFile(Activity a, File f) {
         try {

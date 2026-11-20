@@ -9,6 +9,14 @@
         android:usesCleartextTraffic="false">
 
         <activity
+            android:name=".BibleActivity"
+            android:exported="false"/>
+
+        <activity
+            android:name=".FonTtsActivity"
+            android:exported="false"/>
+
+        <activity
             android:name=".SettingsActivity"
             android:exported="false"/>
 
