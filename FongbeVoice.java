@@ -42,6 +42,13 @@ public class FongbeVoice {
 
     public static void speak(final Activity a, final FongbeData.Entry e) {
 
+        // 0) Prononciation importée (.mkou), prioritaire
+        File imported = Store.audioFile(a, e.key);
+        if (imported != null) {
+            playFile(a, imported);
+            return;
+        }
+
         // 1) Enregistrement natif du projet
         int id = a.getResources().getIdentifier(e.key, "raw", a.getPackageName());
         if (id != 0) {

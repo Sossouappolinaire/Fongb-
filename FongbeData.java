@@ -36,7 +36,7 @@ public class FongbeData {
     public static final String CREDIT =
         "Données : FFR Dataset (Dossou & Emezue), CC BY 4.0 - zenodo.org/records/4432712";
 
-    public static final Entry[] WORDS = {
+    public static final Entry[] BASE_WORDS = {
         new Entry("bonjour", "ku zanzan", "bonjour"),
         new Entry("bonsoir", "kú dó gbadà", "bonsoir"),
         new Entry("bon après-midi", "kú dó hwelɛ́kɔ̀", "bon_apres_midi"),
@@ -257,7 +257,7 @@ public class FongbeData {
         new Entry("mais", "amɔ", "mais_2"),
     };
 
-    public static final Lesson[] LESSONS = {
+    public static final Lesson[] BASE_LESSONS = {
         new Lesson("L'alphabet et les tons",
             "Le fongbé s'écrit avec l'alphabet latin, complété par des lettres spéciales : ɖ, ɛ, ɔ, et des groupes de lettres comme gb, kp, ny, hw, xw.\n\nIl y a 7 voyelles orales : a, e, ɛ, i, o, ɔ, u.\n\nLe fongbé est une langue à tons : la hauteur de la voix peut changer le sens d'un mot. On les note par des accents (haut : é, bas : è).\n\nÉcoute et répète ces mots qui contiennent des sons spéciaux :",
             new Entry[] {
@@ -327,4 +327,18 @@ public class FongbeData {
                 new Entry("il aide ses parents", "e nɔ do alɔ nu mɛjitɔ tɔn lɛ", "il_aide_ses_parents"),
             }),
     };
+
+    // Contenu actuel = contenu de base + contenu importé (.mkou), fusionnés.
+    public static Entry[] WORDS = BASE_WORDS;
+    public static Lesson[] LESSONS = BASE_LESSONS;
+
+    public static synchronized void reload(android.content.Context c) {
+        try {
+            WORDS = Store.mergedWords(c, BASE_WORDS);
+            LESSONS = Store.mergedLessons(c, BASE_LESSONS);
+        } catch (Exception e) {
+            WORDS = BASE_WORDS;
+            LESSONS = BASE_LESSONS;
+        }
+    }
 }

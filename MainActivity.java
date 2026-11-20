@@ -46,6 +46,13 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (!Store.isLoggedIn(this)) {
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_main);
 
         pages[0] = findViewById(R.id.pageHome);
@@ -73,6 +80,9 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (streakChip == null) {
+            return;
+        }
         refreshAll();
     }
 
@@ -532,6 +542,22 @@ public class MainActivity extends Activity {
         profileBox.removeAllViews();
         profileBox.addView(tv("Profil", 24, TEXT, true), lp(M, W, 0, 0, 0, 12));
 
+        org.json.JSONObject user = Store.currentUser(this);
+        if (user != null) {
+            String name = (user.optString("prenom") + " " + user.optString("nom")).trim();
+            LinearLayout pc = box(LinearLayout.HORIZONTAL, 16);
+            pc.setGravity(Gravity.CENTER_VERTICAL);
+            pc.setBackground(bg(YELLOW, 18, YELLOW_STROKE));
+            pc.addView(tv("🙂", 32, TEXT, false), lp(W, W, 0, 0, 12, 0));
+            LinearLayout pt = new LinearLayout(this);
+            pt.setOrientation(LinearLayout.VERTICAL);
+            pt.addView(tv(name, 17, TEXT, true));
+            String sub = user.optBoolean("admin") ? "Administrateur" : user.optString("numero");
+            pt.addView(tv(sub, 13, GREY, false));
+            pc.addView(pt);
+            profileBox.addView(pc, lp(M, W, 0, 0, 0, 12));
+        }
+
         LinearLayout r1 = new LinearLayout(this);
         r1.setOrientation(LinearLayout.HORIZONTAL);
         addStat(r1, "🔥", String.valueOf(Progress.getStreak(this)), "jours d'affilée", true);
@@ -545,6 +571,9 @@ public class MainActivity extends Activity {
         addStat(r2, "📖", Progress.learnedCount(this) + "/" + FongbeData.WORDS.length,
             "mots appris", false);
         profileBox.addView(r2, lp(M, W, 0, 0, 0, 16));
+
+        profileBox.addView(menuRow("⚙️  Paramètres", v ->
+            startActivity(new Intent(this, SettingsActivity.class))), lp(M, W, 0, 0, 0, 8));
 
         profileBox.addView(menuRow("🏫  Espace enseignant", v ->
             new AlertDialog.Builder(this)

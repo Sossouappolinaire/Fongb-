@@ -1,71 +1,113 @@
 package bj.fongbe.academie;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
 
 /**
- * Progression locale : leçons terminées, mots appris, points et série de jours.
+ * Progression de l'utilisateur connecté, enregistrée dans le dossier FongbeKouam2
+ * (fichier progress_<id>.json) : leçons terminées, mots appris, points, série.
  */
 public class Progress {
 
-    private static SharedPreferences p(Context c) {
-        return c.getSharedPreferences("fongbe_progress", Context.MODE_PRIVATE);
+    private static File fileFor(Context c) {
+        return Store.file(c, "progress_" + Store.currentUserId(c) + ".json");
     }
 
-    private static Set<String> set(Context c, String key) {
-        return new HashSet<String>(p(c).getStringSet(key, new HashSet<String>()));
+    private static JSONObject load(Context c) {
+        try {
+            String t = Store.readText(fileFor(c));
+            if (t != null) {
+                return new JSONObject(t);
+            }
+        } catch (Exception ignored) {
+        }
+        return new JSONObject();
+    }
+
+    private static void save(Context c, JSONObject o) {
+        Store.writeText(fileFor(c), o.toString());
+    }
+
+    private static void put(JSONObject o, String k, Object v) {
+        try {
+            o.put(k, v);
+        } catch (Exception ignored) {
+        }
+    }
+
+    private static Set<String> set(JSONObject o, String key) {
+        Set<String> s = new HashSet<String>();
+        JSONArray a = o.optJSONArray(key);
+        if (a != null) {
+            for (int i = 0; i < a.length(); i++) {
+                s.add(a.optString(i));
+            }
+        }
+        return s;
+    }
+
+    private static void putSet(JSONObject o, String key, Set<String> s) {
+        JSONArray a = new JSONArray();
+        for (String x : s) {
+            a.put(x);
+        }
+        put(o, key, a);
     }
 
     // ----- Leçons -----
 
     public static boolean isDone(Context c, int lesson) {
-        return set(c, "done").contains(String.valueOf(lesson));
+        return set(load(c), "done").contains(String.valueOf(lesson));
     }
 
     public static int doneCount(Context c) {
-        return set(c, "done").size();
+        return set(load(c), "done").size();
     }
 
     public static void markDone(Context c, int lesson) {
-        Set<String> s = set(c, "done");
+        JSONObject o = load(c);
+        Set<String> s = set(o, "done");
         if (s.add(String.valueOf(lesson))) {
-            p(c).edit()
-                .putStringSet("done", s)
-                .putInt("points", getPoints(c) + 10)
-                .apply();
+            putSet(o, "done", s);
+            put(o, "points", o.optInt("points", 0) + 10);
+            save(c, o);
         }
     }
 
     // ----- Mots appris -----
 
     public static boolean isLearned(Context c, String key) {
-        return set(c, "learned").contains(key);
+        return set(load(c), "learned").contains(key);
     }
 
     public static void setLearned(Context c, String key, boolean learned) {
-        Set<String> s = set(c, "learned");
+        JSONObject o = load(c);
+        Set<String> s = set(o, "learned");
         if (learned) {
             if (s.add(key)) {
-                p(c).edit()
-                    .putStringSet("learned", s)
-                    .putInt("points", getPoints(c) + 2)
-                    .apply();
+                putSet(o, "learned", s);
+                put(o, "points", o.optInt("points", 0) + 2);
+                save(c, o);
             }
         } else if (s.remove(key)) {
-            p(c).edit().putStringSet("learned", s).apply();
+            putSet(o, "learned", s);
+            save(c, o);
         }
     }
 
     public static int learnedCount(Context c) {
-        return set(c, "learned").size();
+        return set(load(c), "learned").size();
     }
 
     public static int learnedInRange(Context c, FongbeData.Entry[] words, int start, int end) {
-        Set<String> s = set(c, "learned");
+        Set<String> s = set(load(c), "learned");
         int n = 0;
         for (int i = start; i < end && i < words.length; i++) {
             if (s.contains(words[i].key)) {
@@ -78,26 +120,29 @@ public class Progress {
     // ----- Points et série -----
 
     public static int getPoints(Context c) {
-        return p(c).getInt("points", 0);
+        return load(c).optInt("points", 0);
     }
 
     public static int getStreak(Context c) {
-        return p(c).getInt("streak", 0);
+        return load(c).optInt("streak", 0);
     }
 
     public static void touchStreak(Context c) {
+        JSONObject o = load(c);
         long now = System.currentTimeMillis();
         long today = (now + TimeZone.getDefault().getOffset(now)) / 86400000L;
-        long last = p(c).getLong("lastDay", -1L);
+        long last = o.optLong("lastDay", -1L);
         if (last == today) {
             return;
         }
-        int streak = (last == today - 1) ? p(c).getInt("streak", 0) + 1 : 1;
-        p(c).edit().putLong("lastDay", today).putInt("streak", streak).apply();
+        int streak = (last == today - 1) ? o.optInt("streak", 0) + 1 : 1;
+        put(o, "lastDay", today);
+        put(o, "streak", streak);
+        save(c, o);
     }
 
     public static void reset(Context c) {
-        p(c).edit().clear().apply();
+        fileFor(c).delete();
         touchStreak(c);
     }
 }
