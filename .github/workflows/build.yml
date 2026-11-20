@@ -1,1 +1,41 @@
+name: Build APK
 
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Ranger les fichiers à la racine dans la structure Android
+        run: |
+          mkdir -p app/src/main/java/bj/fongbe/academie
+          mkdir -p app/src/main/res/layout
+          mkdir -p app/src/main/res/values
+          mkdir -p app/src/main/res/raw
+          cp *.java app/src/main/java/bj/fongbe/academie/
+          cp activity_*.xml app/src/main/res/layout/
+          cp styles.xml app/src/main/res/values/
+          cp AndroidManifest.xml app/src/main/AndroidManifest.xml
+          cp app-build.gradle app/build.gradle
+          find . -maxdepth 1 \( -name '*.mp3' -o -name '*.ogg' -o -name '*.wav' \) -exec cp {} app/src/main/res/raw/ \;
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.7
+
+      - name: Compiler l'APK
+        run: gradle assembleDebug --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FongbeAcademie-debug
+          path: app/build/outputs/apk/debug/*.apk
