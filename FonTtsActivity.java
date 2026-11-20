@@ -100,8 +100,7 @@ public class FonTtsActivity extends Activity {
                 }
             } catch (Exception e) {
                 f = null;
-                msg = "Voix indisponible (Internet, serveur ou jeton Hugging Face). "
-                    + "Vérifie Config.java.";
+                msg = "Voix indisponible. Détail : " + e.getMessage();
             }
             final File audio = f;
             final String fm = msg;

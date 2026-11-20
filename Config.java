@@ -18,7 +18,8 @@ public class Config {
     public static final String HF_MODEL_URL =
         "https://api-inference.huggingface.co/models/facebook/mms-tts-fon";
 
-    // b) Space Hugging Face public (sans « / » final). Non testé : peut être arrêté.
+    // b) TON Space Hugging Face (sans « / » final) : voir dossier hfspace/.
+    //    Remplace par l'adresse de ton Space, ex. "https://tonpseudo-fon-tts.hf.space".
     public static final String SPACE_URL = "https://bonadossou-fontts.hf.space";
 
     // Nom de l'API Gradio du Space

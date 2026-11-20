@@ -101,37 +101,43 @@ public class FongbeVoice {
             return cached;
         }
 
-        Exception last = null;
+        // Le vocabulaire du modèle est en minuscules
+        String text = fon.toLowerCase(Locale.ROOT);
+        StringBuilder why = new StringBuilder();
 
         // a) API Hugging Face (modèle Meta MMS) avec le jeton de l'utilisateur
         String token = ctx.getSharedPreferences("fongbe", Context.MODE_PRIVATE)
             .getString("hf_token", "");
         if (token != null && token.trim().length() > 0) {
             try {
-                JSONObject body = new JSONObject().put("inputs", fon);
+                JSONObject body = new JSONObject().put("inputs", text);
                 File f = postForAudio(ctx, fon, Config.HF_MODEL_URL, body.toString(),
                     token.trim(), true);
                 if (f != null) {
                     return f;
                 }
             } catch (Exception ex) {
-                last = ex;
+                why.append("API Hugging Face : ").append(ex.getMessage()).append(". ");
             }
+        } else {
+            why.append("pas de jeton Hugging Face. ");
         }
 
-        // b) Space public
+        // b) Space (ton Space Hugging Face, voir dossier hfspace/)
         if (Config.SPACE_URL.length() > 0) {
             try {
-                File f = viaSpace(ctx, fon);
+                File f = viaSpace(ctx, text, fon);
                 if (f != null) {
                     return f;
                 }
             } catch (Exception ex) {
-                last = ex;
+                why.append(ex.getMessage()).append(". ");
             }
+        } else {
+            why.append("SPACE_URL vide dans Config.java. ");
         }
 
-        throw last != null ? last : new Exception("pas d'audio");
+        throw new Exception(why.toString().trim());
     }
 
     /**
@@ -173,21 +179,23 @@ public class FongbeVoice {
         return out;
     }
 
-    private static File viaSpace(Context ctx, String fon) throws Exception {
+    private static File viaSpace(Context ctx, String text, String fon) throws Exception {
         String url = null;
+        String why = "aucune réponse";
         String[] prefixes = {"/gradio_api/call/", "/call/"};
         for (String p : prefixes) {
             try {
-                url = tryGradio(Config.SPACE_URL, p, fon);
+                url = tryGradio(Config.SPACE_URL, p, text);
             } catch (Exception ex) {
                 url = null;
+                why = ex.getMessage() == null ? ex.getClass().getSimpleName() : ex.getMessage();
             }
             if (url != null) {
                 break;
             }
         }
         if (url == null) {
-            return null;
+            throw new Exception("Space : " + why);
         }
         File out = cacheFile(ctx, fon, "wav");
         download(url, out);
@@ -243,7 +251,7 @@ public class FongbeVoice {
         os.close();
 
         if (c.getResponseCode() != 200) {
-            return null;
+            throw new Exception("HTTP " + c.getResponseCode());
         }
 
         String eventId = new JSONObject(readAll(c.getInputStream())).getString("event_id");
