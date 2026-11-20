@@ -1,0 +1,87 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    android:background="#FFF8E7">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Traducteur Français - Fongbé"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#176B52"
+            android:paddingBottom="12dp"/>
+
+        <Button
+            android:id="@+id/btnDirection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sens : Français → Fongbé"/>
+
+        <EditText
+            android:id="@+id/inputText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Écris ton texte ici"
+            android:inputType="textMultiLine"
+            android:minLines="3"
+            android:gravity="top"/>
+
+        <Button
+            android:id="@+id/btnTranslate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Traduire"/>
+
+        <TextView
+            android:id="@+id/resultText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:padding="14dp"
+            android:background="#E3F1EA"/>
+
+        <Button
+            android:id="@+id/btnListenResult"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🔊 Écouter en fongbé"
+            android:visibility="gone"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Traduction automatique : elle peut se tromper, surtout sur les tons. À faire vérifier par un locuteur natif."
+            android:textSize="12sp"
+            android:paddingTop="10dp"/>
+
+        <EditText
+            android:id="@+id/tokenInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Jeton Hugging Face gratuit (facultatif, hf_...)"
+            android:inputType="textPassword"
+            android:singleLine="true"
+            android:layout_marginTop="16dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Avec un jeton : modèle NLLB-200 de Meta. Sans jeton : service Google Translate public."
+            android:textSize="12sp"/>
+
+        <Button
+            android:id="@+id/btnBackTranslate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Retour"/>
+
+    </LinearLayout>
+</ScrollView>

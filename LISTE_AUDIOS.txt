@@ -1,0 +1,235 @@
+LISTE DES ENREGISTREMENTS À FAIRE (vrais locuteurs fongbé)
+=============================================================
+Un fichier par ligne, au format .mp3, .ogg ou .wav, déposé À LA RACINE du projet.
+Le nom doit être EXACTEMENT celui de la colonne 1 (minuscules, sans espace), ex : bonjour.mp3
+Dès qu'un fichier existe, l'appli le joue en priorité (sans Internet).
+
+abeille.mp3   |   abeille   |   wiin
+abomey.mp3   |   Abomey   |   agbŏmɛ̀
+acheter.mp3   |   acheter   |   xɔ
+aeroport.mp3   |   aéroport   |   jɔhɔnmɛhunɖotɛn
+aimer.mp3   |   aimer   |   yí wàn
+alcool.mp3   |   alcool   |   ahan
+aller.mp3   |   aller   |   yì
+ami.mp3   |   ami   |   xɔntɔn
+ananas.mp3   |   ananas   |   agɔn
+annee.mp3   |   année   |   xwè
+appeler.mp3   |   appeler   |   ylɔ́
+apprendre.mp3   |   apprendre   |   kplɔ́n
+arachide.mp3   |   arachide   |   aziín
+arbre.mp3   |   arbre   |   atin
+argent.mp3   |   argent   |   akwɛ́
+au_revoir.mp3   |   au revoir   |   éɖabɔ
+aujourd_hui.mp3   |   aujourd'hui   |   egbe
+avion.mp3   |   avion   |   jɔmɛhún
+banane.mp3   |   banane   |   kókwé
+bateau.mp3   |   bateau   |   tɔjihún
+baton.mp3   |   bâton   |   kpo
+beau.mp3   |   beau   |   nyɔ́ ɖɛkpɛ̀
+beaucoup.mp3   |   beaucoup   |   gege
+bienvenue.mp3   |   bienvenue   |   ku abɔ
+biere.mp3   |   bière   |   bia
+blanc.mp3   |   blanc   |   wewe
+bohicon.mp3   |   Bohicon   |   gbɔxíkɔ̀n
+boire.mp3   |   boire   |   nu
+bon.mp3   |   bon   |   ɖagbe
+bon_anniversaire.mp3   |   bon anniversaire   |   kuɖo jigbézǎn
+bon_apres_midi.mp3   |   bon après-midi   |   kú dó hwelɛ́kɔ̀
+bonjour.mp3   |   bonjour   |   ku zanzan
+bonne_annee.mp3   |   bonne année   |   kú dó xwè yɔ̀yɔ́
+bonne_journee.mp3   |   bonne journée   |   keze ɔ mɛ ni nyɔ nu wé sese
+bonsoir.mp3   |   bonsoir   |   kú dó gbadà
+bouche.mp3   |   bouche   |   nu
+bouteille.mp3   |   bouteille   |   go
+cabri.mp3   |   cabri   |   gbɔ̆
+cafe.mp3   |   café   |   kafe
+campagne.mp3   |   campagne   |   gleta
+canard.mp3   |   canard   |   kpákpá
+cent.mp3   |   cent   |   kanweko
+chaise.mp3   |   chaise   |   azinkpo
+chaleur.mp3   |   chaleur   |   zozo
+chambre.mp3   |   chambre   |   xɔ
+champ.mp3   |   champ   |   gle
+chanter.mp3   |   chanter   |   ji hàn
+chasseur.mp3   |   chasseur   |   gbenyatɔ
+chat.mp3   |   chat   |   awii
+chemin.mp3   |   chemin   |   ali
+cheveux.mp3   |   cheveux   |   ɖa
+chien.mp3   |   chien   |   cuku
+ciel.mp3   |   ciel   |   jixwé
+cinq.mp3   |   cinq   |   atɔɔn
+combien.mp3   |   combien   |   nabi
+comment.mp3   |   comment   |   nɛ̆
+comment_t_appelles_tu.mp3   |   comment t'appelles-tu ?   |   nɛ̆ a nyĭ
+comment_vas_tu.mp3   |   comment vas-tu ?   |   a ɖo ɖagbe à
+cotonou.mp3   |   Cotonou   |   kútɔ́nú
+couteau.mp3   |   couteau   |   jivi
+crabe.mp3   |   crabe   |   agàsá
+crevette.mp3   |   crevette   |   dégon
+crocodile.mp3   |   crocodile   |   lo
+cuisse.mp3   |   cuisse   |   asa
+d_accord.mp3   |   d'accord   |   e nyɔ
+delicieux.mp3   |   délicieux   |   víví
+demain.mp3   |   demain   |   sɔ
+deux.mp3   |   deux   |   wè
+dimanche.mp3   |   dimanche   |   aklunɔzangbe
+dix.mp3   |   dix   |   wŏ
+docteur.mp3   |   docteur   |   dotoo
+douleur.mp3   |   douleur   |   vivɛ
+eau.mp3   |   eau   |   sin
+ecole.mp3   |   école   |   azɔmɛ
+ecouter.mp3   |   écouter   |   sè
+eglise.mp3   |   église   |   amisa
+elephant.mp3   |   éléphant   |   ajinaku
+eleve.mp3   |   élève   |   azɔmɛvi
+enfant.mp3   |   enfant   |   vì
+epaule.mp3   |   épaule   |   abɔ
+epouse.mp3   |   épouse   |   asi
+et.mp3   |   et   |   kpódó
+etoile.mp3   |   étoile   |   sunvi
+famille.mp3   |   famille   |   akɔ
+femme.mp3   |   femme   |   nyɔ̆nù
+feu.mp3   |   feu   |   zo
+feuille.mp3   |   feuille   |   ama
+fille.mp3   |   fille   |   yɔnnúvi
+fleur.mp3   |   fleur   |   folo
+fleuve.mp3   |   fleuve   |   tɔ
+fort.mp3   |   fort   |   syɛnsyɛn
+frere.mp3   |   frère   |   nɔví
+frere_aine.mp3   |   frère aîné   |   fofó ɖaxo
+froid.mp3   |   froid   |   avivɔ
+fromage.mp3   |   fromage   |   amɔn
+garcon.mp3   |   garçon   |   súnnu
+genou.mp3   |   genou   |   koli
+grand.mp3   |   grand   |   ɖaxo
+grenouille.mp3   |   grenouille   |   bésé
+haricots.mp3   |   haricots   |   ayikún
+herbe.mp3   |   herbe   |   zunkan
+hippopotame.mp3   |   hippopotame   |   aklákú
+hopital.mp3   |   hôpital   |   dotohoué
+huile.mp3   |   huile   |   amì
+huit.mp3   |   huit   |   tantɔn
+ici.mp3   |   ici   |   fi
+igname.mp3   |   igname   |   tévi
+il_aide_ses_parents.mp3   |   il aide ses parents   |   e nɔ do alɔ nu mɛjitɔ tɔn lɛ
+il_est_a_la_maison.mp3   |   il est à la maison   |   é ɖo xwe gbe
+j_aime_beaucoup_mon_pere.mp3   |   j'aime beaucoup mon père   |   un yí wan nú tɔ́ ce ɖaxó
+je_m_appelle.mp3   |   je m'appelle   |   un nɔ nyi
+je_suis_a_cotonou.mp3   |   je suis à Cotonou   |   un ɖo kutɔnu
+je_t_aime.mp3   |   je t'aime   |   un yí wàn nú wè
+je_vais_aller_au_marche.mp3   |   je vais aller au marché   |   un na yi aximɛ
+je_vais_bien.mp3   |   je vais bien   |   un ɖo ganji
+jour.mp3   |   jour   |   azan
+lait.mp3   |   lait   |   anɔsín
+lampe.mp3   |   lampe   |   zogbɛ́n
+langue.mp3   |   langue   |   ɖɛ
+larmes.mp3   |   larmes   |   avĭ
+leopard.mp3   |   léopard   |   kpɔ
+lievre.mp3   |   lièvre   |   azwì
+lion.mp3   |   lion   |   kinikini
+livre.mp3   |   livre   |   wèmá
+long.mp3   |   long   |   gaga
+lundi.mp3   |   lundi   |   tɛnigbé
+lune.mp3   |   lune   |   sun
+ma_mere.mp3   |   ma mère   |   nɔ cé
+main.mp3   |   main   |   alɔ
+mais.mp3   |   maïs   |   agbadé
+mais_2.mp3   |   mais   |   amɔ
+maison.mp3   |   maison   |   xwé
+manger.mp3   |   manger   |   ɖu
+mangue.mp3   |   mangue   |   amanga
+marche.mp3   |   marché   |   axi
+mari.mp3   |   mari   |   asu
+marmite.mp3   |   marmite   |   zɛn
+matin.mp3   |   matin   |   zanzan
+mauvais.mp3   |   mauvais   |   nyanya
+mer.mp3   |   mer   |   xu
+merci.mp3   |   merci   |   é na cɛ núwe
+merci_a_vous.mp3   |   merci à vous   |   é na cɛ númi
+merci_beaucoup.mp3   |   merci beaucoup   |   a wá nǔ ɖesu
+merci_pour_ton_travail.mp3   |   merci pour ton travail   |   kú d'ázɔ̆
+mercredi.mp3   |   mercredi   |   azangagbé
+mere.mp3   |   mère   |   nɔ
+mes_parents.mp3   |   mes parents   |   mɛjitɔ ce lɛ
+mois.mp3   |   mois   |   sun
+mon_enfant.mp3   |   mon enfant   |   vì cé
+montagne.mp3   |   montagne   |   so
+montre.mp3   |   montre   |   alɔgàn
+mouche.mp3   |   mouche   |   sukpɔ
+mourir.mp3   |   mourir   |   kú
+mouton.mp3   |   mouton   |   gbɔ
+noir.mp3   |   noir   |   wiwi
+noix_de_coco.mp3   |   noix de coco   |   agɔnkɛ
+nombril.mp3   |   nombril   |   hɔn
+non.mp3   |   non   |   eo
+nous_sommes_a_l_ecole.mp3   |   nous sommes à l'école   |   mí ɖo azɔmɛ
+nuage.mp3   |   nuage   |   azizɔ
+nuit.mp3   |   nuit   |   zan
+oignon.mp3   |   oignon   |   ayomà
+oiseau.mp3   |   oiseau   |   xɛvi
+orange.mp3   |   orange   |   yovozɛn
+os.mp3   |   os   |   xú
+ou.mp3   |   où   |   fítɛ́
+oui.mp3   |   oui   |   ɛɛn
+ouidah.mp3   |   Ouidah   |   glexwe
+ouvrier.mp3   |   ouvrier   |   azɔwatɔ
+pain.mp3   |   pain   |   wɔxuxu
+panier.mp3   |   panier   |   xàsun
+parakou.mp3   |   Parakou   |   paraku
+parents.mp3   |   parents   |   mɛjitɔ
+parler.mp3   |   parler   |   ɖɔ xó
+peau.mp3   |   peau   |   agbaza
+pere.mp3   |   père   |   tɔ
+pied.mp3   |   pied   |   afɔ
+piment.mp3   |   piment   |   atakín
+pluie.mp3   |   pluie   |   jì
+poisson.mp3   |   poisson   |   hwevi
+poule.mp3   |   poule   |   kokló
+pourquoi.mp3   |   pourquoi   |   etɛ wutu
+professeur.mp3   |   professeur   |   nukplɔnmɛtɔ
+quand.mp3   |   quand   |   hwetɛnu
+qui.mp3   |   qui   |   mɛ̀
+radio.mp3   |   radio   |   ladyó
+rat.mp3   |   rat   |   ajaka
+riz.mp3   |   riz   |   mɔlikun
+roi.mp3   |   roi   |   axɔsu
+sable.mp3   |   sable   |   kɔ
+sel.mp3   |   sel   |   jɛ
+semaine.mp3   |   semaine   |   sɛgblamɛ
+sept.mp3   |   sept   |   tɛnwe
+serpent.mp3   |   serpent   |   dàn
+singe.mp3   |   singe   |   ato
+soir.mp3   |   soir   |   gbadà
+soleil.mp3   |   soleil   |   hwezivɔ
+sucre.mp3   |   sucre   |   suklé
+ta_famille_va_t_elle_bien.mp3   |   ta famille va-t-elle bien ?   |   akɔ towé ɖo gangi à
+table.mp3   |   table   |   távo
+telephone.mp3   |   téléphone   |   alŏkàn
+television.mp3   |   télévision   |   gbavinukpɛnnɔ
+terre.mp3   |   terre   |   ayìkúngban
+tete.mp3   |   tête   |   ta
+the.mp3   |   thé   |   tii
+tomate.mp3   |   tomate   |   timáti
+ton_pere.mp3   |   ton père   |   tɔ towé
+tortue.mp3   |   tortue   |   akpatá
+train.mp3   |   train   |   pipan
+travail.mp3   |   travail   |   azɔ
+travailler.mp3   |   travailler   |   wà azɔ̀
+trois.mp3   |   trois   |   atɔn
+uf.mp3   |   œuf   |   azin
+un.mp3   |   un   |   ɖokpó
+un_peu.mp3   |   un peu   |   kpɛɖé
+vache.mp3   |   vache   |   nyibu
+velo.mp3   |   vélo   |   kɛkɛ́
+vendre.mp3   |   vendre   |   sa
+venir.mp3   |   venir   |   wá
+vent.mp3   |   vent   |   jɔhɔn
+ventre.mp3   |   ventre   |   adɔgò
+verre.mp3   |   verre   |   kɔfu
+vetement.mp3   |   vêtement   |   awù
+viande.mp3   |   viande   |   lan
+vieux.mp3   |   vieux   |   xoxo
+ville.mp3   |   ville   |   toxo
+voir.mp3   |   voir   |   mɔ
+voiture.mp3   |   voiture   |   mɔ̆to
+voleur.mp3   |   voleur   |   ajotɔ
