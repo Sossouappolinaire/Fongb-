@@ -1,0 +1,4 @@
+1. Sur huggingface.co : New -> Space, nom "fon-tts", SDK "Gradio", matériel "CPU basic" (gratuit), visibilité Public.
+2. Dans l'onglet Files : ajoute app.py et requirements.txt de ce dossier. Attends "Running".
+3. Dans Config.java, mets SPACE_URL = "https://TONPSEUDO-fon-tts.hf.space" puis recompile sur GitHub.
+(Licence du modèle : CC-BY-NC, usage non commercial.)
