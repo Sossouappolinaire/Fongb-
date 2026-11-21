@@ -32,6 +32,7 @@ public class FonTtsActivity extends Activity {
     private TextView status;
     private TextView listen;
     private TextView download;
+    private EditText spaceInput;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +79,16 @@ public class FonTtsActivity extends Activity {
         root.addView(label("Voix synthétique : les tons peuvent être imprécis. "
             + "Licence du modèle : CC-BY-NC (usage non commercial).", 12, GREY, false),
             lp(0, 12, 0, 0));
+
+        root.addView(label("Si la voix ne marche pas : colle ici l'adresse de ton Space "
+            + "Hugging Face (voir hfspace/LISEZ-MOI.txt). Laisse vide pour l'adresse par défaut.",
+            12, GREY, false), lp(0, 16, 0, 0));
+        spaceInput = new EditText(this);
+        spaceInput.setHint("https://tonpseudo-fon-tts.hf.space");
+        spaceInput.setSingleLine(true);
+        spaceInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+        spaceInput.setText(getSharedPreferences("fongbe", MODE_PRIVATE).getString("space_url", ""));
+        root.addView(spaceInput, lp(0, 4, 0, 0));
     }
 
     private void run(final boolean save) {
@@ -86,6 +97,8 @@ public class FonTtsActivity extends Activity {
             status.setText("Écris d'abord une phrase en fongbé.");
             return;
         }
+        getSharedPreferences("fongbe", MODE_PRIVATE).edit()
+            .putString("space_url", spaceInput.getText().toString().trim()).apply();
         status.setText("Génération de la voix…");
         listen.setEnabled(false);
         download.setEnabled(false);

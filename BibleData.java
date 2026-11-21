@@ -313,4 +313,29 @@ public class BibleData {
         new Item("d", "", "chaussure", ""),
         new Item("d", "", "chapeau", ""),
     };
+
+    // ----- Audio fongbé (mp3 de la Bible Fon13, lu par chapitre) -----
+    // Pour ajouter un chapitre : copie l'adresse de son fichier .mp3 et ajoute une ligne.
+    public static final String[][] CHAPTER_AUDIO = {
+        {"Genèse 1", "https://audio-bible-cdn.youversionapi.com/2413/32k/GEN/1-a042d09948e21f1e0a27cc27dfccf9c9.mp3?version_id=817"},
+        {"Genèse 2", "https://audio-bible-cdn.youversionapi.com/2413/32k/GEN/2-8aaa89f7e2714fa39c753f9e78d5e718.mp3?version_id=817"},
+        {"Genèse 3", "https://audio-bible-cdn.youversionapi.com/2413/32k/GEN/3-32546246c9cc3a89f1a0f9c7948ba3df.mp3?version_id=817"},
+        {"Genèse 4", "https://audio-bible-cdn.youversionapi.com/2413/32k/GEN/4-a42a690bc7c33a51f83b3cae98978901.mp3?version_id=817"},
+        {"Genèse 5", "https://audio-bible-cdn.youversionapi.com/2413/32k/GEN/5-acc75f83742a1c411b6557239a4d40e9.mp3?version_id=817"},
+    };
+
+    /** Lien mp3 du chapitre d'une référence (« Genèse 1:1 » → « Genèse 1 »), ou "" s'il n'y en a pas. */
+    public static String chapterAudioUrl(String ref) {
+        if (ref == null || ref.isEmpty()) {
+            return "";
+        }
+        int i = ref.lastIndexOf(':');
+        String chapter = (i > 0 ? ref.substring(0, i) : ref).trim();
+        for (String[] c : CHAPTER_AUDIO) {
+            if (c[0].equalsIgnoreCase(chapter)) {
+                return c[1];
+            }
+        }
+        return "";
+    }
 }

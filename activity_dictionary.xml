@@ -8,7 +8,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Dictionnaire Français - Fongbé"
+        android:text="Mots de la Bible en fon"
         android:textSize="22sp"
         android:textStyle="bold"
         android:textColor="#176B52"

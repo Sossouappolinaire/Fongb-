@@ -93,6 +93,35 @@ public class FongbeVoice {
 
     // ----- Génération de la voix (bloquant : hors thread principal) -----
 
+    /**
+     * Adresse du Space à utiliser : celle saisie dans l'écran « Voix fongbé » si elle existe,
+     * sinon Config.SPACE_URL. Accepte aussi l'adresse de la page huggingface.co/spaces/...
+     */
+    public static String spaceUrl(Context ctx) {
+        String u = ctx.getSharedPreferences("fongbe", Context.MODE_PRIVATE)
+            .getString("space_url", "");
+        if (u == null || u.trim().isEmpty()) {
+            u = Config.SPACE_URL;
+        }
+        u = u.trim();
+        int i = u.indexOf("huggingface.co/spaces/");
+        if (i >= 0) {
+            String[] parts = u.substring(i + "huggingface.co/spaces/".length()).split("/");
+            if (parts.length >= 2) {
+                String sub = (parts[0] + "-" + parts[1]).toLowerCase(Locale.ROOT)
+                    .replace('_', '-').replace('.', '-');
+                u = "https://" + sub + ".hf.space";
+            }
+        }
+        if (!u.isEmpty() && !u.startsWith("http")) {
+            u = "https://" + u;
+        }
+        while (u.endsWith("/")) {
+            u = u.substring(0, u.length() - 1);
+        }
+        return u;
+    }
+
     /** Renvoie le fichier audio du texte fongbé : cache, sinon API Hugging Face, puis Space. */
     public static File synthesize(Context ctx, String fon) throws Exception {
 
@@ -124,7 +153,7 @@ public class FongbeVoice {
         }
 
         // b) Space (ton Space Hugging Face, voir dossier hfspace/)
-        if (Config.SPACE_URL.length() > 0) {
+        if (spaceUrl(ctx).length() > 0) {
             try {
                 File f = viaSpace(ctx, text, fon);
                 if (f != null) {
@@ -134,7 +163,7 @@ public class FongbeVoice {
                 why.append(ex.getMessage()).append(". ");
             }
         } else {
-            why.append("SPACE_URL vide dans Config.java. ");
+            why.append("adresse du Space vide. ");
         }
 
         throw new Exception(why.toString().trim());
@@ -185,7 +214,7 @@ public class FongbeVoice {
         String[] prefixes = {"/gradio_api/call/", "/call/"};
         for (String p : prefixes) {
             try {
-                url = tryGradio(Config.SPACE_URL, p, text);
+                url = tryGradio(spaceUrl(ctx), p, text);
             } catch (Exception ex) {
                 url = null;
                 why = ex.getMessage() == null ? ex.getClass().getSimpleName() : ex.getMessage();
@@ -344,6 +373,112 @@ public class FongbeVoice {
             }
         }
         return null;
+    }
+
+    // ----- mp3 par lien (chapitre de la Bible en fongbé) -----
+
+    /**
+     * Fichier d'enregistrement durable d'un chapitre (ex. GEN_1.mp3), rangé dans le stockage
+     * de l'appli : Android ne l'efface pas tout seul, contrairement au cache.
+     */
+    public static File audioFile(Context ctx, String url) {
+        // Dossier « audio » de l'appli (FongbeKouam2/audio) : les chapitres téléchargés y restent.
+        File dir = Store.audioDir(ctx);
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("/([0-9A-Z]{3})/(\\d+)-").matcher(url);
+        String base = m.find() ? m.group(1) + "_" + m.group(2)
+            : Integer.toHexString(url.hashCode());
+        File f = new File(dir, "Bible_" + base + ".mp3");
+
+        // Ancien emplacement (stockage interne) : on récupère le fichier déjà téléchargé.
+        File old = new File(new File(ctx.getFilesDir(), "fonbible_audio"), base + ".mp3");
+        if (!f.exists() && old.exists() && old.length() > 0) {
+            if (!old.renameTo(f)) {
+                try {
+                    java.io.FileInputStream in = new java.io.FileInputStream(old);
+                    saveStream(in, f);
+                    old.delete();
+                } catch (Exception ignored) {
+                    // le chapitre sera simplement retéléchargé
+                }
+            }
+        }
+        return f;
+    }
+
+    public interface FileCallback {
+        void run(File f);
+    }
+
+    /** Donne le mp3 du chapitre : celui déjà enregistré, sinon il est téléchargé puis enregistré. */
+    public static void ensureAudio(final Activity a, final String url, final FileCallback ok) {
+        final File f = audioFile(a, url);
+        File old = new File(a.getCacheDir(), "bible_" + Integer.toHexString(url.hashCode()) + ".mp3");
+        if (!f.exists() && old.exists() && old.length() > 0) {
+            old.renameTo(f);
+        }
+        if (f.exists() && f.length() > 0) {
+            ok.run(f);
+            return;
+        }
+        Toast.makeText(a, "Téléchargement de l'audio fongbé…", Toast.LENGTH_SHORT).show();
+        new Thread(() -> {
+            try {
+                HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
+                c.setConnectTimeout(20000);
+                c.setReadTimeout(60000);
+                c.setRequestProperty("User-Agent",
+                    "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) "
+                    + "Chrome/120.0 Mobile Safari/537.36");
+                if (c.getResponseCode() != 200) {
+                    throw new Exception("HTTP " + c.getResponseCode());
+                }
+                saveStream(c.getInputStream(), f);
+                a.runOnUiThread(() -> {
+                    Toast.makeText(a, "✅ Audio enregistré : disponible hors ligne",
+                        Toast.LENGTH_SHORT).show();
+                    ok.run(f);
+                });
+            } catch (final java.io.IOException ex) {
+                a.runOnUiThread(() -> Toast.makeText(a,
+                    "Pas de connexion : l'audio doit être téléchargé une première fois avec Internet.",
+                    Toast.LENGTH_LONG).show());
+            } catch (final Exception ex) {
+                a.runOnUiThread(() -> Toast.makeText(a,
+                    "Audio indisponible (" + ex.getMessage() + ")",
+                    Toast.LENGTH_LONG).show());
+            }
+        }).start();
+    }
+
+    /**
+     * Télécharge le mp3 d'un chapitre sans message ni rappel (à appeler hors du thread principal).
+     * Renvoie true si le fichier est sur le téléphone à la fin.
+     */
+    public static boolean downloadAudioBlocking(Context ctx, String url) {
+        File f = audioFile(ctx, url);
+        if (f.exists() && f.length() > 0) {
+            return true;
+        }
+        try {
+            HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
+            c.setConnectTimeout(20000);
+            c.setReadTimeout(60000);
+            c.setRequestProperty("User-Agent",
+                "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) "
+                + "Chrome/120.0 Mobile Safari/537.36");
+            if (c.getResponseCode() != 200) {
+                return false;
+            }
+            saveStream(c.getInputStream(), f);
+            return f.exists() && f.length() > 0;
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
+    /** Joue le chapitre en entier ; la première fois il est téléchargé et enregistré. */
+    public static void playRemote(final Activity a, final String url) {
+        ensureAudio(a, url, f -> playFile(a, f));
     }
 
     // ----- Lecture -----

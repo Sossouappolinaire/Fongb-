@@ -119,6 +119,12 @@ public class Progress {
 
     // ----- Points et série -----
 
+    public static void addPoints(Context c, int n) {
+        JSONObject o = load(c);
+        put(o, "points", o.optInt("points", 0) + n);
+        save(c, o);
+    }
+
     public static int getPoints(Context c) {
         return load(c).optInt("points", 0);
     }

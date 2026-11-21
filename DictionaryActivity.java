@@ -100,11 +100,11 @@ public class DictionaryActivity extends Activity {
         t.setTextSize(18);
         t.setLayoutParams(new LinearLayout.LayoutParams(
             0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-        t.setText("Français : " + e.fr + "\nFongbé : " + e.fon);
+        t.setText(e.fon + "\n" + e.fr);
 
         Button b = new Button(this);
         b.setText("🔊");
-        b.setOnClickListener((View v) -> FongbeVoice.speak(this, e));
+        b.setOnClickListener((View v) -> BibleAudio.play(this, e));
 
         row.addView(t);
         row.addView(b);
@@ -114,6 +114,7 @@ public class DictionaryActivity extends Activity {
     @Override
     protected void onDestroy() {
         FongbeVoice.stopPlayer();
+        BibleAudio.stop();
         super.onDestroy();
     }
 }

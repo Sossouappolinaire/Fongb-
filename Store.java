@@ -148,6 +148,23 @@ public class Store {
 
     public static void logout(Context c) {
         session(c).edit().remove("uid").apply();
+        AppLock.unlocked(c);
+    }
+
+    /** Le compte connecté a-t-il un code PIN ? (l'administrateur n'en a pas) */
+    public static boolean hasPin(Context c) {
+        JSONObject u = currentUser(c);
+        return u != null && !u.optString("hash", "").isEmpty();
+    }
+
+    /** Vérifie le PIN du compte connecté (même méthode que la connexion). */
+    public static boolean verifyPin(Context c, String pin) {
+        JSONObject u = currentUser(c);
+        if (u == null) {
+            return false;
+        }
+        String h = u.optString("hash", "");
+        return !h.isEmpty() && h.equals(hash(u.optString("salt"), pin));
     }
 
     private static void setUser(Context c, String id) {

@@ -75,6 +75,16 @@ public class MainActivity extends Activity {
         Progress.touchStreak(this);
         buildTabs();
         select(0);
+        startBibleSync();
+    }
+
+    /** Charge (ou complète) les chapitres de la Bible en fon, puis rafraîchit l'écran. */
+    private void startBibleSync() {
+        BibleCourse.sync(this, () -> {
+            if (streakChip != null) {
+                refreshAll();
+            }
+        });
     }
 
     @Override
@@ -83,7 +93,16 @@ public class MainActivity extends Activity {
         if (streakChip == null) {
             return;
         }
+        if (FongbeData.LESSONS.length < BibleCourse.UNITS.length && !BibleCourse.syncing) {
+            startBibleSync();
+        }
         refreshAll();
+    }
+
+    @Override
+    protected void onDestroy() {
+        BibleAudio.stop();
+        super.onDestroy();
     }
 
     // ------------------------------------------------------------------
@@ -186,6 +205,11 @@ public class MainActivity extends Activity {
         final int total = FongbeData.LESSONS.length;
         int done = Progress.doneCount(this);
 
+        if (total == 0) {
+            homeBox.addView(loadingCard(), lp(M, W, 0, 0, 0, 12));
+            return;
+        }
+
         // Carte de progression
         LinearLayout prog = box(LinearLayout.HORIZONTAL, 16);
         prog.setGravity(Gravity.CENTER_VERTICAL);
@@ -194,7 +218,7 @@ public class MainActivity extends Activity {
         LinearLayout txt = new LinearLayout(this);
         txt.setOrientation(LinearLayout.VERTICAL);
         txt.addView(tv("Voir votre progression", 12, GREY, false));
-        txt.addView(tv("Débutant A1 · " + done + "/" + total + " leçons", 17, TEXT, true));
+        txt.addView(tv("Débutant A1 ▾  ·  " + done + "/" + BibleCourse.UNITS.length + " unités", 17, TEXT, true));
         prog.addView(txt, new LinearLayout.LayoutParams(0, W, 1f));
         prog.addView(tv("→", 22, GREEN, true));
         prog.setOnClickListener(v -> select(3));
@@ -203,8 +227,8 @@ public class MainActivity extends Activity {
         // Accès rapides
         LinearLayout row = new LinearLayout(this);
         row.setOrientation(LinearLayout.HORIZONTAL);
-        row.addView(tile("🔎", "Dictionnaire", DictionaryActivity.class), lp(0, W, 0, 0, 4, 0));
-        row.addView(tile("✍️", "Exercices", QuizActivity.class), lp(0, W, 4, 0, 4, 0));
+        row.addView(tile("🔎", "Mots", DictionaryActivity.class), lp(0, W, 0, 0, 4, 0));
+        row.addView(tile("✍️", "Examen", QuizActivity.class), lp(0, W, 4, 0, 4, 0));
         row.addView(tile("🌍", "Traducteur", TranslateActivity.class), lp(0, W, 4, 0, 4, 0));
         row.addView(tile("🎙️", "Voix Fon", FonTtsActivity.class), lp(0, W, 4, 0, 0, 0));
         for (int i = 0; i < 4; i++) {
@@ -255,16 +279,55 @@ public class MainActivity extends Activity {
             card.addView(top);
 
             boolean isDone = Progress.isDone(this, i);
-            String label = isDone ? "Revoir ✓" : (i == firstUndone ? "Continuer" : "Commencer");
+            final boolean locked = firstUndone != -1 && i > firstUndone;
+            final int unlockAt = firstUndone;
+            String label = isDone ? "Revoir ✓"
+                : (locked ? "🔒 Débloquer cette unité" : (i == firstUndone ? "Continuer" : "Commencer"));
             TextView btn = tv(label, 14, GREEN, true);
             btn.setGravity(Gravity.CENTER);
             btn.setPadding(dp(8), dp(10), dp(8), dp(10));
             btn.setBackground(bg(WHITE, 14, 0));
             card.addView(btn, lp(M, W, 0, 12, 0, 0));
 
-            card.setOnClickListener(v -> openLesson(idx));
+            card.setOnClickListener(v -> {
+                if (locked) {
+                    Toast.makeText(this, "Termine d'abord l'unité " + (unlockAt + 1) + ".",
+                        Toast.LENGTH_SHORT).show();
+                } else {
+                    openLesson(idx);
+                }
+            });
             homeBox.addView(card, lp(M, W, 0, 0, 0, 12));
         }
+
+        if (total < BibleCourse.UNITS.length) {
+            homeBox.addView(loadingCard(), lp(M, W, 0, 0, 0, 12));
+        }
+    }
+
+    /** Message affiché tant que les passages de la Bible en fon ne sont pas sur le téléphone. */
+    private View loadingCard() {
+        LinearLayout c = box(LinearLayout.VERTICAL, 16);
+        c.setBackground(bg(WHITE, 18, YELLOW_STROKE));
+        boolean busy = BibleCourse.syncing;
+        c.addView(tv(busy ? "Chargement de la Bible en fon…" : "Passages non chargés", 16, TEXT, true));
+        String detail = busy
+            ? "Les leçons arrivent au fur et à mesure. Une fois chargées, elles marchent sans Internet."
+            : "Le cours utilise la Bible en fon : connecte-toi à Internet une première fois."
+                + (BibleCourse.error.isEmpty() ? "" : "\n(" + BibleCourse.error + ")");
+        c.addView(tv(detail, 13, GREY, false), lp(M, W, 0, 4, 0, 0));
+        if (!busy) {
+            TextView retry = tv("Réessayer", 14, GREEN, true);
+            retry.setGravity(Gravity.CENTER);
+            retry.setPadding(dp(8), dp(10), dp(8), dp(10));
+            retry.setBackground(bg(YELLOW, 14, 0));
+            retry.setOnClickListener(v -> {
+                startBibleSync();
+                refreshAll();
+            });
+            c.addView(retry, lp(M, W, 0, 10, 0, 0));
+        }
+        return c;
     }
 
     private String shortText(String s) {
@@ -330,6 +393,11 @@ public class MainActivity extends Activity {
     }
 
     private void buildVocab() {
+        if (FongbeData.WORDS.length == 0) {
+            reviewBox.addView(loadingCard(), lp(M, W, 0, 0, 0, 12));
+            return;
+        }
+
         // Mot du jour
         int dayIdx = Calendar.getInstance().get(Calendar.DAY_OF_YEAR) % FongbeData.WORDS.length;
         final FongbeData.Entry w = FongbeData.WORDS[dayIdx];
@@ -354,7 +422,7 @@ public class MainActivity extends Activity {
         speak.setGravity(Gravity.CENTER);
         speak.setPadding(dp(12), dp(12), dp(12), dp(12));
         speak.setBackground(bg(YELLOW, 24, 0));
-        speak.setOnClickListener(v -> FongbeVoice.speak(this, w));
+        speak.setOnClickListener(v -> BibleAudio.play(this, w));
         wc.addView(speak);
         reviewBox.addView(wc, lp(M, W, 0, 0, 0, 16));
 
@@ -392,8 +460,8 @@ public class MainActivity extends Activity {
 
         c.addView(tv("Deck " + (d + 1), 15, TEXT, true));
 
-        TextView sub = tv(FongbeData.WORDS[start].fr
-            + (end - start > 1 ? ", " + FongbeData.WORDS[start + 1].fr : "") + "…",
+        TextView sub = tv(FongbeData.WORDS[start].fon
+            + (end - start > 1 ? ", " + FongbeData.WORDS[start + 1].fon : "") + "…",
             12, GREY, false);
         sub.setMaxLines(1);
         sub.setEllipsize(TextUtils.TruncateAt.END);
@@ -429,8 +497,8 @@ public class MainActivity extends Activity {
         final FongbeData.Entry e = FongbeData.WORDS[start + i];
         new AlertDialog.Builder(this)
             .setTitle("Deck " + (deck + 1) + " · " + (i + 1) + "/" + (end - start))
-            .setMessage(e.fr)
-            .setPositiveButton("Voir la réponse", (d, w) -> showAnswer(deck, i, e))
+            .setMessage(e.fon + "\n\nTu connais ce mot de la Bible en fon ?")
+            .setPositiveButton("Voir le verset", (d, w) -> showAnswer(deck, i, e))
             .setNegativeButton("Fermer", (d, w) -> {
                 refreshHeader();
                 buildReview();
@@ -443,10 +511,16 @@ public class MainActivity extends Activity {
     }
 
     private void showAnswer(final int deck, final int i, final FongbeData.Entry e) {
-        FongbeVoice.speak(this, e);
+        BibleAudio.play(this, e);
+        String context = e.fr;
+        if (e instanceof BibleCourse.Word) {
+            BibleCourse.Word bw = (BibleCourse.Word) e;
+            context = bw.ref + "\n" + bw.verseFon
+                + (bw.verseFr.isEmpty() ? "" : "\n\n" + bw.verseFr);
+        }
         new AlertDialog.Builder(this)
-            .setTitle(e.fr)
-            .setMessage(e.fon)
+            .setTitle(e.fon)
+            .setMessage(context)
             .setPositiveButton("Je sais ✓", (d, w) -> {
                 Progress.setLearned(this, e.key, true);
                 openCard(deck, i + 1);
@@ -603,8 +677,9 @@ public class MainActivity extends Activity {
                 .setNegativeButton("Annuler", null)
                 .show()), lp(M, W, 0, 0, 0, 16));
 
-        TextView credit = tv("Mode local : les cours et le dictionnaire intégrés fonctionnent "
-            + "sans Internet.\n" + FongbeData.CREDIT, 12, GREY, false);
+        TextView credit = tv("Tous les cours, mots et exercices viennent de la Bible en fon. "
+            + "Chargés une première fois, ils fonctionnent sans Internet.\n"
+            + FongbeData.CREDIT, 12, GREY, false);
         profileBox.addView(credit);
     }
 

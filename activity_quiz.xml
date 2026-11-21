@@ -1,69 +1,13 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="20dp"
-    android:background="#FFF8E7">
+    android:background="#FFF8E7"
+    android:fillViewport="true">
 
     <LinearLayout
+        android:id="@+id/quizRoot"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/progressText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#176B52"
-            android:textSize="14sp"/>
-
-        <TextView
-            android:id="@+id/questionText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Question"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:paddingTop="8dp"
-            android:paddingBottom="20dp"/>
-
-        <Button
-            android:id="@+id/answerA"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Réponse A"/>
-
-        <Button
-            android:id="@+id/answerB"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Réponse B"/>
-
-        <Button
-            android:id="@+id/answerC"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Réponse C"/>
-
-        <TextView
-            android:id="@+id/feedbackText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:paddingTop="20dp"/>
-
-        <Button
-            android:id="@+id/btnListen"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="🔊 Écouter la bonne réponse"
-            android:visibility="gone"/>
-
-        <Button
-            android:id="@+id/btnNextQuestion"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Question suivante"
-            android:visibility="gone"/>
-
-    </LinearLayout>
+        android:orientation="vertical"
+        android:padding="16dp"/>
 </ScrollView>
