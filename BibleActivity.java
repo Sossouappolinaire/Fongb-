@@ -570,6 +570,26 @@ public class BibleActivity extends Activity {
         }
     }
 
+    /** Chapitre précédent (-1) ou suivant (+1) ; passe au livre voisin en bout de livre. */
+    private void fonStep(int d) {
+        int chap = fonChap + d;
+        if (chap < 1) {
+            if (fonBook == 0) {
+                return;
+            }
+            fonBook--;
+            chap = FonBible.CHAPTERS[fonBook];
+        } else if (chap > FonBible.CHAPTERS[fonBook]) {
+            if (fonBook >= FonBible.NAMES.length - 1) {
+                return;
+            }
+            fonBook++;
+            chap = 1;
+        }
+        fonChap = chap;
+        loadFon();
+    }
+
     private void loadFon() {
         stopPlayer();
         prefs.edit().putInt("fonbible_book", fonBook).putInt("fonbible_chap", fonChap).apply();
